@@ -1,0 +1,39 @@
+https://ndu.chartnexus.com/tbiz/arts_plus/cnxwidgetslayout-98.js
+<counter-search-box marketid='0,2,3,4,5,12,14,15,16,19,20'>
+
+<counter-search-box marketid='0,2,3,4,5,12,14,15,16,19,20,44,46'>
+	
+
+https://ndu.chartnexus.com/tbiz/arts_plus/search-input/overlay-search.js
+overlay_marketid = '0'
+
+overlay_marketid = '0,2,3,4,5,12,14,15,16,19,20'
+
+overlay_marketid = "0,2,3,4,5,12,14,15,19,20"
+
+overlay_marketid = "0,2,3,4,5,12,14,15,16,19,20,44,46"
+
+
+https://ndu.chartnexus.com/tbiz/arts_plus/
+"EOD_MARKETS":"0,2,3,4,5,11,12,14,15,16,17,18,19,20,46"
+
+<counter-search-box marketid='0,2,3,4,5,12,14,15,16,19,20,44,46'>
+
+"LIVE_MARKETS" : "0,2,3,4,5,15"
+
+fixed_markets = [11]
+fixed_markets = [2]
+
+"DEFAULT_MARKETS" : "11"
+"DEFAULT_MARKETS" : "2"
+
+
+
+https://ndu.chartnexus.com/tbiz/arts_plus/js_dynamic/cnx_common.js
+https://tbizfiles.chartnexus.com/cnxideawebv12/widget_20260812/js/cnx_common.js
+https://tbizfiles.chartnexus.com/cnxideawebv12/widget_20260812/js_20260428/cnx_common.js
+standard_mkt_order = ["0","2","3","4","5","15","14","19","20","17","18","12","16"]
+standard_mkt_order = ["2","0","3","4","5","15","14","19","20","17","18","12","16"]
+
+
+https://ndu.chartnexus.com/tbiz/arts_plus/

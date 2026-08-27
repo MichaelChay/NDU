@@ -1,0 +1,21 @@
+/* Last modified by : 2021-03-25 15:36:42.0 */
+
+:root {
+    --heading1: 32px;
+    --heading2: 24px;
+    --heading3: 18px;
+    --heading4: 16px;
+    --content1: 15px;
+    --content2: 14px;
+    --content3: 13px;
+    --content4: 12px;
+    --content5: 11px;
+    --content6: 10px;
+    --content7: 9px;
+    --content8: 8px;
+    --iconsize: 25px;
+    --iconbgsize: 24px;
+    --widget_icon_bg_size: 20px;
+    --iconsize_mobile: 50px;
+    --iconbgsize_mobile: 48px;
+}

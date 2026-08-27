@@ -1,0 +1,53 @@
+// ==UserScript==
+// @name         3_DEFAULT_MARKET--> Divident & Earning Calenda Work - ChartNexus
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  Intercept and replace DEFAULT_MARKETS from 11 to 2(Bursa KLSE) so that Divident & Earning Calenda Work 
+// @author       Fish Head Cracker
+// @match        https://ndu.chartnexus.com/tbiz/arts_plus/*
+// @run-at       document-start
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    // 1. Intercept JSON parsing if DEFAULT_MARKETS comes from API responses/JSON configs
+    const originalJSONParse = JSON.parse;
+    JSON.parse = function(text, reviver) {
+        if (typeof text === 'string' && text.includes('DEFAULT_MARKETS')) {
+            text = text.replace(/"DEFAULT_MARKETS"\s*:\s*"?11"?/g, '"DEFAULT_MARKETS":"2"');
+        }
+        return originalJSONParse.call(this, text, reviver);
+    };
+
+    // 2. Intercept global window variable assignment if defined as an inline object
+    let _DEFAULT_MARKETS = "2";
+    Object.defineProperty(window, 'DEFAULT_MARKETS', {
+        get: function() {
+            return _DEFAULT_MARKETS;
+        },
+        set: function(val) {
+            // Override whenever the site attempts to set DEFAULT_MARKETS
+            _DEFAULT_MARKETS = (val == "11" || val == 11) ? "2" : val;
+        },
+        configurable: true,
+        enumerable: true
+    });
+
+    // 3. Monitor and mutate config objects dynamically after DOM load
+    document.addEventListener('DOMContentLoaded', () => {
+        // Intercept global config object if present (e.g., window.CONFIG, window.AppConfig, etc.)
+        for (const key in window) {
+            try {
+                if (window[key] && typeof window[key] === 'object') {
+                    if (window[key].DEFAULT_MARKETS === "11" || window[key].DEFAULT_MARKETS === 11) {
+                        window[key].DEFAULT_MARKETS = "2";
+                    }
+                }
+            } catch (e) {
+                // Ignore cross-origin/restricted properties
+            }
+        }
+    });
+})();

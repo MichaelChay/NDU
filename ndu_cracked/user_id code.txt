@@ -1,0 +1,42 @@
+		var user_id;
+		function cnx_onGwt_verifyLoginModules(visitor, user_name, modules, primary_mid, _user_id, all_modules, supported_eod_markets){
+			if(!visitor) {
+				$("#welcome_user").html(user_name);
+				if(modules != null) {
+					var exp_date = modules['363'];
+					if(exp_date != null) {
+						var cur_date = formatDate(new Date());
+						if(cur_date <= exp_date) {
+							user_id = _user_id;
+							
+							try {
+								getMapTime(modules, primary_mid, all_modules, supported_eod_markets);
+								getSubscriptionTable(modules, primary_mid, all_modules, supported_eod_markets);
+							} catch(err) {
+								console.log("error: subscription error");
+							}
+							
+							try {
+								initAccessLog(user_id);
+								initGA(user_id);
+							} catch(err) {
+								console.log("error: failed to log access");
+							}
+							
+							return true;
+						}
+					}
+				}
+				
+				$("#subscription_error_modal").modal({
+					backdrop: 'static',
+					keyboard: false  // to prevent closing with Esc button (if you want this too)
+				});
+				$("#subscription_error_modal").modal("show");
+				return false;
+			}
+			
+			showLogin();
+			$("#welcome_user").html("Visitor");
+			return true;
+		}

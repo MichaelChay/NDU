@@ -1,0 +1,78 @@
+function YLj(a) {
+    this.a = a
+}
+
+function _Lj(a) {
+    this.a = a
+}
+
+function $Lj(a, b) {
+    a.a.Qr(false, b.a)
+}
+
+function Gyf(a, b, c, d, e, f) {
+    var g;
+    g = new eLh;
+    bLh(g, $7j, new DLh('ctrl-report-user'));
+    bLh(g, Enk, new DLh(c));
+    b != null && bLh(g, Fnk, new DLh(b));
+    d != null && bLh(g, Gnk, new DLh(d));
+    e || bLh(g, 'add', (qKh(), qKh(), oKh));
+    Ryf(a, g, f)
+}
+
+function Ryf(a, b, c) {
+    var d, e, f;
+    if (!Fyf(a)) {
+        !!c && $Lj(c, (Gzf(), Ezf));
+        return
+    }
+    f = a.r.g.readyState;
+    if (f == 1) {
+        e = (SSj(), Yjj(Date.now()));
+        if (akj(e, a.e)) {
+            !!c && $Lj(c, (Gzf(), Dzf));
+            return
+        }
+        a.e = Sjj(e, aek);
+        bLh(b, Chk, new DLh(a.q));
+        d = dLh(b);
+        qzf(a.r, 'CTR,' + d);
+        return
+    }!!c && $Lj(c, (Gzf(), Bzf))
+}
+xkj(1487, 1, E8j);
+_.zj = function XLj() {
+    var a;
+    if (jih()) {
+        a = new eLh;
+        this.d != null && bLh(a, Fnk, new DLh(this.d));
+        bLh(a, Enk, new DLh(this.e));
+        this.b != null && bLh(a, Gnk, new DLh(this.b));
+        bLh(a, 'add', (qKh(), this.a ? pKh : oKh));
+        ngh(Hnk, a, new YLj(this.c));
+        return
+    }!!wKj && Lyf(wKj) ? Gyf(wKj, this.d, this.e, this.b, this.a, !this.c ? null : new _Lj(this.c)) : !!this.c && this.c.Qr(false, 'not connected')
+};
+xkj(2930, 179, $dk, YLj);
+_.Kr = function ZLj(a, b) {
+    var c, d, e, f;
+    if (this.a) {
+        c = zlh(b, yik);
+        if (c) {
+            e = new AAd(c);
+            d = tlh(e.a, Bnk, -1);
+            f = Clh(e.a, eck);
+            this.a.Qr(d == 1, f)
+        } else {
+            this.a.Qr(false, Ink)
+        }
+    } else {
+        tmh ? (SSj(), RSj) : (console.log('' + b), undefined)
+    }
+};
+var ufj = kQj(dck, 'WeTalkWidgetAPI/22/1', 2930);
+xkj(2931, 1, {}, _Lj);
+var vfj = kQj(dck, 'WeTalkWidgetAPI/22/2', 2931);
+F5j(evh)(29);
+//# sourceURL=cnxwidgetslayout-29.js

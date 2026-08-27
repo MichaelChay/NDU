@@ -1,0 +1,1 @@
+goto https://ndu.chartnexus.com/tbiz/arts_plus/ create a tampermonkey script override 0,2,3,4,5 to 2,0,3,4,5

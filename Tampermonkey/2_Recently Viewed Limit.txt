@@ -1,0 +1,55 @@
+// ==UserScript==
+// @name         2_Raise Recent Viewed Limit - ChartNexus
+// @namespace    company-qa
+// @version      1.0
+// @description  Reset Recent Viewed Limit to "999"
+// @author       Fish Head Cracker
+// @match        https://ndu.chartnexus.com/tbiz/arts_plus/*
+// @run-at       document-start
+// @grant        none
+// @noframes
+// ==/UserScript==
+
+(() => {
+    'use strict';
+
+    const RECENTLY_VIEW_LIMIT = 999;
+
+    function OVERRIDE_VIEW_LIMIT() {
+        const root = document.documentElement;
+        if (!root) {
+            setTimeout(OVERRIDE_VIEW_LIMIT, 0);
+            return;
+        }
+
+        let limitMeta = document.querySelector(
+            'meta[cnxvar="COUNTER_VIEW_LIMITS"]'
+        );
+
+        if (!limitMeta) {
+            limitMeta = document.createElement('meta');
+            limitMeta.setAttribute('cnxvar', 'COUNTER_VIEW_LIMITS');
+
+            const parent = document.head || root;
+            parent.appendChild(limitMeta);
+        }
+
+        limitMeta.setAttribute('value', String(RECENTLY_VIEW_LIMIT));
+
+        /*
+         * The normal Recently Viewed panel capacity is 40.
+         * Keep it at 40 unless you also want to test more than 40 entries.
+         */
+        const recentMeta = document.querySelector(
+            'meta[cnxfile="recentlyviewed"]'
+        );
+
+        if (recentMeta) {
+            recentMeta.setAttribute('capacity', '999');
+        }
+
+        console.log('[QA] COUNTER_VIEW_LIMITS overridden to', RECENTLY_VIEW_LIMIT);
+    }
+
+    OVERRIDE_VIEW_LIMIT();
+})();

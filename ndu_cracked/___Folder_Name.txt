@@ -1,0 +1,46 @@
+.vscode
+_DataURI
+cdn.chartnexus.com
+cdn.jsdelivr.net
+cdnjs.cloudflare.com
+chat1.chartnexus.com
+dividend.chartnexus.com
+eod7.chartnexus.com
+fonts.googleapis.com
+fonts.gstatic.com
+Infor
+livefeed4.chartnexus.com
+ndu.chartnexus.com
+oss.sheetjs.com
+ssl.google-analytics.com
+tbiz2.chartnexus.com
+tbizfiles.chartnexus.com
+theme.chartnexus.com
+www.facebook.com
+www.googletagmanager.com
+
+127.0.0.1 .vscode _DataURI cdn.chartnexus.com cdn.jsdelivr.net cdnjs.cloudflare.com
+127.0.0.1 chat1.chartnexus.com dividend.chartnexus.com eod7.chartnexus.com fonts.googleapis.com fonts.gstatic.com
+127.0.0.1 Infor livefeed4.chartnexus.com ndu.chartnexus.com oss.sheetjs.com ssl.google-analytics.com
+127.0.0.1 tbiz2.chartnexus.com tbizfiles.chartnexus.com theme.chartnexus.com www.facebook.com www.googletagmanager.com
+
+127.0.0.1 .vscode
+127.0.0.1 _DataURI
+127.0.0.1 cdn.chartnexus.com
+127.0.0.1 cdn.jsdelivr.net
+127.0.0.1 cdnjs.cloudflare.com
+127.0.0.1 chat1.chartnexus.com
+127.0.0.1 dividend.chartnexus.com
+127.0.0.1 eod7.chartnexus.com
+127.0.0.1 fonts.googleapis.com
+127.0.0.1 fonts.gstatic.com
+127.0.0.1 Infor
+127.0.0.1 livefeed4.chartnexus.com
+127.0.0.1 ndu.chartnexus.com
+127.0.0.1 oss.sheetjs.com
+127.0.0.1 ssl.google-analytics.com
+127.0.0.1 tbiz2.chartnexus.com
+127.0.0.1 tbizfiles.chartnexus.com
+127.0.0.1 theme.chartnexus.com
+127.0.0.1 www.facebook.com
+127.0.0.1 www.googletagmanager.com

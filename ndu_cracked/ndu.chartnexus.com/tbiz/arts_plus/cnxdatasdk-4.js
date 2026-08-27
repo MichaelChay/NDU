@@ -1,0 +1,109 @@
+function Ts(a, b) {
+    Ss.call(this, a, b)
+}
+
+function dw(a, b, c, d, e) {
+    this.a = a;
+    this.e = b;
+    this.b = c;
+    this.c = d;
+    this.d = e
+}
+
+function Xbb() {
+    Tbb();
+    var a, b, c;
+    c = Sbb++ + Date.now();
+    a = YJ($wnd.Math.floor(c * Bib)) & Cib;
+    b = YJ(c - a * dib);
+    this.a = a ^ 1502;
+    this.b = b ^ Aib
+}
+
+function vd() {
+    ud();
+    var a, b, c;
+    a = VI(_J, xfb, 11, 8, 15, 1);
+    for (b = 0; b < 8; b++) {
+        c = Ubb(td, sd);
+        a[b] = rd[c]
+    }
+    return _6(a, 0, a.length)
+}
+
+function ud() {
+    ud = ZV;
+    rd = ZI(TI(_J, 1), xfb, 11, 15, [65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57]);
+    td = new Xbb;
+    sd = rd.length
+}
+var rd, sd = 0,
+    td;
+YV(157, 57, {
+    157: 1,
+    57: 1
+}, Ts);
+var xM = u5(Dfb, 'PostInitMessageData', 157);
+YV(284, 12, bgb);
+_.V = function Iu() {
+    var b, c, d, e, f, g, h, i;
+    try {
+        if (pB((new A8((rt(), ht).a)).a) == 0) {
+            return
+        }
+        e = false;
+        f = (n7(), zV(Date.now()));
+        for (c = new G8((new A8(ht.a)).a); c.b;) {
+            b = F8(c);
+            d = PJ(b.Dc());
+            h = KJ(b.Ec(), 87).a;
+            if (vV(h, f) < 0) {
+                g = KJ(jdb(qt, d), 70);
+                if (g.f) {
+                    hu(g.g, d, g.d, g.e)
+                } else {
+                    kdb(ht, d, j6(tV(f, g.e)));
+                    i = mn(g.a).src;
+                    EX(g.a, vt(i))
+                }
+                e = true
+            }
+        }(pB((new A8(ht.a)).a) > 0 || e) && Hd(this.a, Ofb)
+    } catch (a) {
+        a = rV(a);
+        if (!RJ(a, 10)) throw sV(a)
+    }
+};
+YV(275, 12, bgb);
+_.V = function Ku() {
+    xt((Fc(), Cc), new lI, (nv(), mv))
+};
+YV(271, 12, bgb);
+_.V = function cv() {
+    var a;
+    GA('waiting for window id before loading child frame ' + this.a);
+    !(rt(), nt) && (nt = new Ok);
+    a = new dw(this.d, this.c, this.a, this.e, this.b);
+    Hk(nt, a)
+};
+YV(272, 12, bgb);
+_.V = function ev() {
+    var a, b, c, d;
+    (rt(), it) == null && (it = vd());
+    c = new lI;
+    iI(c, Sq, new KI(it));
+    d = (n7(), PV(zV(Date.now())) + '.' + it);
+    a = (Df(), Ff(L6(d, (Jeb(), Ieb)), Ws[1]));
+    iI(c, 't2', new KI(F6(a, a.length, Ieb)));
+    b = new Ts((tc(), sc), c);
+    iu(b)
+};
+YV(159, 1, {
+    159: 1
+}, dw);
+_.d = 0;
+var VM = u5(Dfb, 'WidgetApi/PendingFrameLoad', 159);
+YV(174, 1, {}, Xbb);
+var Sbb = 0;
+tfb(gD)(4);
+//# sourceURL=cnxdatasdk-4.js

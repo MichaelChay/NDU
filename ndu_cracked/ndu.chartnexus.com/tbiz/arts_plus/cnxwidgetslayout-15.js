@@ -1,0 +1,8 @@
+xkj(5468, 22, E8j);
+_.zj = function Cdb() {
+    null.az();
+    null.az()
+};
+var XSh = kQj(r9j, 'HTML5ChartsContainerWithDrawnItem/3', 5468);
+F5j(evh)(15);
+//# sourceURL=cnxwidgetslayout-15.js

@@ -1,0 +1,9 @@
+"WATERMARK_PNG": "tbizv1/image/art/NDU-Watermark.svg",
+
+
+"WATERMARK_PNG": "C:\Users\ xxxxxxxxxx \Downloads\NDU\$$$-Watermark.svg",
+"WATERMARK_PNG": "https://raw.githubusercontent.com/MichaelChay/NDU/main/$$$-Watermark.svg",
+
+
+using chrome browser goto https://ndu.chartnexus.com/tbiz/arts_plus/tbizv1.jsp  create a tampermonkey script to replace
+ "WATERMARK_PNG": "tbizv1/image/art/NDU-Watermark.svg" to "WATERMARK_PNG": "file:///C:/Users/Desktop001/Downloads/NDU/$$$-Watermark.svg"

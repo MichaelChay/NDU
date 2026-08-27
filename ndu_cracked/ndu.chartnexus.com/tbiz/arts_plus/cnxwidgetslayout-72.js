@@ -1,0 +1,399 @@
+function Hpe() {}
+
+function Mue() {}
+
+function MIj() {}
+
+function OIj() {}
+
+function QIj() {}
+
+function xFf() {}
+
+function FKf(a) {
+    this.a = a
+}
+
+function Fpe(a) {
+    this.a = a
+}
+
+function uAd(a) {
+    pAd.call(this, a)
+}
+
+function ype(a, b) {
+    this.a = a;
+    TBd.call(this, b)
+}
+
+function Jpe(a, b, c) {
+    this.c = a;
+    this.a = b;
+    this.b = c
+}
+
+function Dpe(a, b, c, d) {
+    this.a = a;
+    this.d = b;
+    this.b = c;
+    this.c = d
+}
+
+function uFf(a, b) {
+    this.a = a;
+    this.b = b;
+    An.call(this)
+}
+
+function Bpe(a, b) {
+    this.c = a;
+    this.d = b;
+    this.a = Q6g('AUTOPOP', true)
+}
+
+function AKf() {
+    un.call(this, 'debug off')
+}
+
+function EKf(a, b, c) {
+    vIf(b, c, a.a)
+}
+
+function vpe() {
+    vpe = ykj;
+    upe = new wpe
+}
+
+function pFf() {
+    pFf = ykj;
+    nFf = new Fnh;
+    lFf = S6g('MARKET_TDATE_POLL', shk)
+}
+
+function wpe() {
+    this.a = Q6g('ENABLE_POPUP_CHART_NEW_WINDOW', false);
+    this.b = new ype(this, (Vze(), Aze))
+}
+
+function sFf(a, b) {
+    this.c = a;
+    this.d = b;
+    un.call(this, 'new-date-detector');
+    this.a = 0;
+    this.b = S6g('NEW_DATE_DETECT_INTER', 15)
+}
+
+function Ape(a, b) {
+    var c;
+    c = (O6g(), P6g(Vok, null));
+    c == null || c.length <= 6 ? ($wnd.alert(Wok), undefined) : Tdh(c, b, null, 0, a.c.a.a)
+}
+
+function qFf(a, b) {
+    pFf();
+    var c, d, e;
+    mFf = b;
+    if (!oFf) {
+        e = new MSj;
+        for (c = 0; c < a.length; c++) {
+            ISj((e.a += a[c], e), ' ')
+        }
+        d = e.a;
+        oFf = new sFf(d, a);
+        sn(oFf, t7j)
+    }
+}
+
+function edh(a, b) {
+    Ych();
+    var c, d, e, f, g, h;
+    f = new pch(a, b);
+    for (h = (e = (new vWj(Xch)).a.Ix().Zn(), new AWj(e)); h.a.oy();) {
+        g = (c = HMh(h.a.py(), 105), HMh(c.qs(), 361));
+        g.f && ieh(g, (d = f, hfh(), d))
+    }
+}
+
+function xpe(a) {
+    var b, c, d;
+    d = S6g('MAX_POPUPS', 3);
+    b = RLh(rhj, L6j, 2, d, 6, 1);
+    for (c = 0; c < d; c++) {
+        b[c] = 'pop' + c
+    }
+    Odh((xxd(), nxd), new Bpe(a, b));
+    nah(Uok, new Fpe(a));
+    nah('cinfo', new Hpe);
+    return true
+}
+
+function rFf(a, b) {
+    pFf();
+    var c, d, e, f, g, h, i, j, k, l, m, n;
+    m = (tLh(), ALh(b, true));
+    i = w8j;
+    if (m) {
+        g = m.ex();
+        if (g) {
+            for (e = 0; e < a.length; e++) {
+                h = a[e];
+                c = ulh(g, '' + h);
+                if (!c) {
+                    wmh('missing next poll array ' + I4d(h));
+                    continue
+                }
+                if (c.a.length < 2) {
+                    wmh('invalid next poll array ' + I4d(h) + aak + c);
+                    continue
+                }
+                f = HMh(inh(nFf, cRj(h)), 1224);
+                if (!f) {
+                    f = new xFf;
+                    lnh(nFf, cRj(h), f)
+                }
+                n = Alh(c, 0, true);
+                if (n.length != 8) {
+                    continue
+                }
+                f.a = Jo(n);
+                j = wlh(c, 1, 0);
+                d = zCf(h, 0);
+                if (!d) {
+                    continue
+                }
+                k = (SSj(), Yjj(Date.now()));
+                if (Zjj(f.a, d.e)) {
+                    !!mFf && EKf(mFf, h, f.a);
+                    f.c = k;
+                    f.b = Sjj(f.c, rek)
+                } else {
+                    f.c = k;
+                    f.b = Sjj(f.c, dkj(kkj(j, 10), q7j))
+                }
+                l = kkj(f.b, k);
+                Ujj(l, i) < 0 && (i = nkj(l))
+            }
+        }
+    }
+    return i
+}
+var Vok = 'popchart_url',
+    Wok = 'Missing popup configuration',
+    Yok = 'unexpected action id ';
+xkj(1543, 661, {}, uAd);
+xkj(4030, 1, {}, wpe);
+_.a = false;
+var upe;
+var pqi = kQj(udk, 'DetachChartAction', 4030);
+xkj(4031, 125, _bk, ype);
+_.Up = function zpe(a) {
+    return xpe(this)
+};
+var oqi = kQj(udk, 'DetachChartAction/1', 4031);
+xkj(4032, 1, bck, Bpe);
+_.Wp = function Cpe(a, b) {
+    var c, d, e, f, g, h, i, j, k, l, m, n;
+    if (!(GBd(), sBd) && XIj) {
+        AGj();
+        GGj(Fmk, Gmk, Hmk);
+        return
+    }
+    j = new $Dd(true);
+    i = new TBj;
+    this.c.a.c = new uAd(b);
+    if (this.a) {
+        ++this.b;
+        this.b >= this.d.length && (this.b = 0);
+        m = this.d[this.b];
+        n = (O6g(), P6g(Vok, null));
+        n == null || n.length <= 6 ? ($wnd.alert(Wok), undefined) : Tdh(n, m, null, 0, this.c.a.a);
+        return
+    }
+    edh((AGj(), sFj), new eLh);
+    l = 0;
+    for (f = this.d, g = 0, h = f.length; g < h; ++g) {
+        e = f[g];
+        ++l;
+        c = l > 1;
+        d = 'Pop Slot ' + l;
+        k = new Hgb(d);
+        ayh((Tn(), k.$i), 'sel_panel');
+        LH(k, new Dpe(this, j, c, e), (qEh(), qEh(), pEh));
+        SBj(i, k)
+    }
+    uzd(j, i);
+    SDd(j, tlh(this.c.a.c.a, Y5j, 0) - 50, tlh(this.c.a.c.a, Z5j, 0));
+    WDd(j)
+};
+_.a = false;
+_.b = -1;
+var kqi = kQj(udk, 'DetachChartAction/1/1', 4032);
+xkj(4033, 1, xak, Dpe);
+_.Wn = function Epe(a) {
+    MDd(this.d);
+    if (!SIj && this.b) {
+        AGj();
+        GGj(Imk, Jmk, null);
+        return
+    }
+    Ape(this.a, this.c)
+};
+_.b = false;
+var jqi = kQj(udk, 'DetachChartAction/1/1/1', 4033);
+xkj(4034, 1, Cck, Fpe);
+_.dr = function Gpe(a, b, c) {
+    if (!this.a.a.c) {
+        vmh(new fxf('unexpected null data'));
+        return
+    }
+    pah(c, a, this.a.a.c.a)
+};
+var lqi = kQj(udk, 'DetachChartAction/1/2', 4034);
+xkj(4035, 1, Cck, Hpe);
+_.dr = function Ipe(a, b, c) {
+    var d, e;
+    d = tlh(b, Tbk, -1);
+    e = Clh(b, Ubk);
+    e != null && (iJj(), fvh(7, new GJj(d, new Jpe(e, c, a))))
+};
+var nqi = kQj(udk, 'DetachChartAction/1/3', 4035);
+xkj(4036, 348, cck, Jpe);
+_.aq = function Kpe(a) {
+    var b, c;
+    b = l1f(a, this.c);
+    c = new oAd(b);
+    bLh(c.a, Xok, new MKh(Wjj(p1f(a), B7j)));
+    pah(this.a, this.b, c.a)
+};
+var mqi = kQj(udk, 'DetachChartAction/1/3/1', 4036);
+xkj(2422, 22, E8j);
+_.zj = function hse() {
+    xpe((vpe(), upe).b)
+};
+xkj(2699, 22, E8j);
+_.zj = function Kue() {
+    if (!this.a.o) {
+        this.a.o = new Mue;
+        this.a.w != null && this.a.w.length > 0 && (cIf(), qFf(this.a.w, new FKf(this.a.o)))
+    }
+};
+xkj(2700, 1, {}, Mue);
+var Mri = kQj(udk, 'TimeframeAndLiveDataStreamAction/6/1', 2700);
+var lFf = 0,
+    mFf, nFf, oFf = null;
+xkj(3544, 48, {}, sFf);
+_.ej = function tFf() {
+    var b, c, d, e, f, g;
+    e = (SSj(), Yjj(Date.now()));
+    if (Zjj(e, this.a)) {
+        wmh('New date detector at work ' + $o(e) + ', markets=' + this.c);
+        this.a = Sjj(e, dkj(this.b, q7j))
+    }
+    try {
+        try {
+            d = P6g('TDATE_URL', null);
+            if (d != null && RRj(d.substr(0, 4), Fhk)) {
+                f = d
+            } else {
+                b = P6g(Dgk, In);
+                f = b + '/applet/markets_tdate.jsp'
+            }
+            g = new Tlh((Klh(), Ilh), f);
+            g.a = false;
+            g.c.c = false;
+            Plh(g, null, new uFf(this, this.d))
+        } catch (a) {
+            a = Qjj(a);
+            if (OMh(a, 8)) {
+                c = a;
+                vmh(c)
+            } else throw Rjj(a)
+        }
+        sn(this, (pFf(), lFf))
+    } catch (a) {
+        a = Qjj(a);
+        if (OMh(a, 8)) {
+            c = a;
+            vmh(c);
+            dGd(this.lb, Dik)
+        } else throw Rjj(a)
+    }
+};
+_.a = 0;
+_.b = 0;
+var ELi = kQj(Agk, 'DetectNewDateLib/1', 3544);
+xkj(3545, 77, {}, uFf);
+_.fj = function vFf(a) {
+    vmh(a);
+    sn(this.a, (pFf(), lFf))
+};
+_.hj = function wFf(a) {
+    var b, c;
+    b = a.zx();
+    c = rFf(this.b, b);
+    c < 0 ? (c = 12000) : c < (pFf(), lFf) && c < N9j && (c = N9j);
+    sn(this.a, c)
+};
+var DLi = kQj(Agk, 'DetectNewDateLib/1/1', 3545);
+xkj(1224, 1, {
+    1224: 1
+}, xFf);
+_.bj = function yFf() {
+    return Vo(this.a) + ', next poll=' + new eKh(this.b)
+};
+_.a = 0;
+_.b = 0;
+_.c = 0;
+var FLi = kQj(Agk, 'DetectNewDateLib/NextPollInfo', 1224);
+xkj(4049, 22, E8j);
+_.zj = function zKf() {
+    var a;
+    a = new AKf;
+    dGd(a.lb, Dak)
+};
+xkj(4050, 48, {}, AKf);
+_.ej = function BKf() {
+    cIf(), XHf = false
+};
+var qMi = kQj(Agk, 'XLiveDataReceiverForStation/1/1', 4050);
+xkj(3543, 1, {}, FKf);
+var tMi = kQj(Agk, 'XLiveDataReceiverForStation_Common/2', 3543);
+xkj(1889, 22, E8j);
+_.zj = function LIj() {
+    nah('ULOG', new MIj);
+    nah('UCLOG', new OIj);
+    Odh((AGj(), zGj), new QIj)
+};
+xkj(1890, 1, Cck, MIj);
+_.dr = function NIj(a, b, c) {
+    var d, e;
+    d = Clh(b, Lmk);
+    e = Clh(b, 'subm');
+    xHj(d, e)
+};
+var vej = kQj(dck, 'ChartingWidgetApi/8/1', 1890);
+xkj(1891, 1, Cck, OIj);
+_.dr = function PIj(a, b, c) {
+    var d, e, f;
+    e = Clh(b, Lmk);
+    d = tlh(b, Tbk, -1);
+    f = Clh(b, Ubk);
+    d >= 0 && f != null && wHj(e, d, f)
+};
+var wej = kQj(dck, 'ChartingWidgetApi/8/2', 1891);
+xkj(1892, 1, bck, QIj);
+_.Wp = function RIj(a, b) {
+    var c, d;
+    c = tlh(b, Zgk, -1);
+    if (c <= 0) {
+        umh ? vmh(new fxf(Yok + c)) : tmh ? (SSj(), RSj) : (console.log(Yok + c), undefined);
+        return
+    }
+    d = Clh(b, 'dt');
+    NVg();
+    fvh(32, new XVg(cRj(c), d))
+};
+var xej = kQj(dck, 'ChartingWidgetApi/8/3', 1892);
+F5j(evh)(72);
+//# sourceURL=cnxwidgetslayout-72.js

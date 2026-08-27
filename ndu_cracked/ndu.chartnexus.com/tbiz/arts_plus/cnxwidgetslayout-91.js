@@ -1,0 +1,146 @@
+function vue() {}
+
+function tue(a) {
+    this.a = a
+}
+
+function rue() {
+    un.call(this, 'cut-stream')
+}
+
+function ave(a) {
+    this.a = a;
+    un.call(this, 'delay fa data')
+}
+
+function yOj(a, b) {
+    bLh(a.a, Tbk, new HKh(b))
+}
+
+function zOj(a, b) {
+    bLh(a.a, Ubk, new DLh(b))
+}
+
+function Rte(a, b) {
+    var c;
+    c = pqe();
+    Ste(a, b, c)
+}
+
+function AOj(a) {
+    bAd.call(this);
+    if (a) {
+        yOj(this, a.j);
+        zOj(this, a.d)
+    }
+}
+
+function _ue(a) {
+    this.d = a;
+    this.b = this.d.v ? new ave(this) : null;
+    this.c = new Anh
+}
+
+function wCf(a) {
+    sCf();
+    var b, c;
+    c = zCf(a, 0);
+    if (!c) {
+        return 0
+    }
+    if (Xjj(lCf[a], 0)) {
+        return 0
+    }
+    b = (SSj(), kkj(Yjj(Date.now()), lCf[a]));
+    return Sjj(Sjj(c.e, oCf[a] * B7j), b)
+}
+
+function oue(a) {
+    var b, c;
+    a.a.u = new _ue(a.a);
+    if (XIj) {
+        b = new rue;
+        c = S6g('VISITOR_TIMEOUT', 60) * q7j;
+        dGd(b.lb, c)
+    }
+    Tte(a.a);
+    Odh((AGj(), aGj), new tue(a));
+    Odh(cGj, new vue)
+}
+xkj(2692, 48, {}, rue);
+_.ej = function sue() {
+    Qte();
+    fvh(90, new Tue)
+};
+var Dri = kQj(udk, 'TimeframeAndLiveDataStreamAction/2/1', 2692);
+xkj(2693, 1, bck, tue);
+_.Wp = function uue(a, b) {
+    var c;
+    c = tlh(b, 'i', 0);
+    Rte(this.a.a, c)
+};
+var Eri = kQj(udk, 'TimeframeAndLiveDataStreamAction/2/2', 2693);
+xkj(2694, 1, bck, vue);
+_.Wp = function wue(a, b) {
+    Qte();
+    fvh(90, new Tue)
+};
+var Fri = kQj(udk, 'TimeframeAndLiveDataStreamAction/2/3', 2694);
+xkj(2695, 1, E8j);
+_.zj = function zue() {
+    oue(this.a)
+};
+xkj(2685, 1, {}, _ue);
+_.a = null;
+var Tri = kQj(udk, 'TimeframeAndLiveDataStreamAction/LiveStockDataListenerImplementation', 2685);
+xkj(2686, 48, {}, ave);
+_.ej = function bve() {
+    var b, c, d, e, f, g, h, i, j, k, l, m, n, o, p;
+    if (!this.a.a || !this.a.a.U) {
+        return
+    }
+    try {
+        e = w3f(this.a.a, 2, true);
+        if (e > 0) {
+            j = e - 1;
+            c = u3f(this.a.a, 2);
+            n = M3f(this.a.a, 2)[j];
+            i = A3f(this.a.a, 2)[j];
+            k = J3f(this.a.a, 2)[j];
+            b = c[j];
+            p = dkj(P3f(this.a.a, 2)[j], 100);
+            d = new AOj(this.a.a.T);
+            bLh(d.a, 'o', new zKh(n));
+            bLh(d.a, 'h', new zKh(i));
+            bLh(d.a, 'l', new zKh(k));
+            bLh(d.a, 'c', new zKh(b));
+            bLh(d.a, 'v', new MKh(p));
+            if (j > 0) {
+                o = c[j - 1];
+                bLh(d.a, 'pc', new zKh(o))
+            }
+            h = 0;
+            l = v3f(this.a.a, 4);
+            if (l >= 0) {
+                f = x3f(this.a.a, 4);
+                m = f[l - 1];
+                !!m && (h = m.e)
+            }
+            Ujj(h, 0) <= 0 && (h = wCf(this.a.a.T.j));
+            Ujj(h, 0) > 0 && bLh(d.a, 'mt', new MKh(h));
+            Ych();
+            cdh((AGj(), JFj), d.a, (hfh(), cfh))
+        }
+    } catch (a) {
+        a = Qjj(a);
+        if (OMh(a, 8)) {
+            g = a;
+            vmh(g)
+        } else throw Rjj(a)
+    }
+};
+var Rri = kQj(udk, 'TimeframeAndLiveDataStreamAction/LiveStockDataListenerImplementation/1', 2686);
+xkj(4415, 393, {}, AOj);
+var Fgj = kQj(apk, 'LiveOHLCVData', 4415);
+F5j(evh)(91);
+//# sourceURL=cnxwidgetslayout-91.js

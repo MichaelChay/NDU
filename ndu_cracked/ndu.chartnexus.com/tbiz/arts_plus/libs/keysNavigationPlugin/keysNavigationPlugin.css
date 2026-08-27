@@ -1,0 +1,12 @@
+.keysNavigation-focus {
+    background-color: #f6f7fd;
+}
+
+.keysNavigation-focus.quotes-table-body-row:nth-child(even),
+.keysNavigation-focus.quotes-table-body-row:nth-child(odd) {
+    background-color: #f6f7fd;
+}
+
+.main-table-alert-contents .keysNavigation-focus {
+    background-color: #f6f7fd;
+}

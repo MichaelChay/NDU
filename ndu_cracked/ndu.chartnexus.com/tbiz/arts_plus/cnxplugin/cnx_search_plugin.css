@@ -1,0 +1,66 @@
+.cnx-search-popup {
+    position: absolute;
+    max-height: 300px;
+    overflow: auto;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 2px 2px 10px 0px #dfdfdf;
+    z-index: 1;
+}
+
+.cnx-search-row img {
+    height: 24px;
+    width: 24px;
+    margin-left: 0.5rem;
+}
+
+.cnx-search-row {
+    transition: height 1s ease;
+    cursor: pointer;
+}
+
+.cnx-search-row:hover {
+    background-color: #EFEFEF;
+}
+
+.cnx-search-row.active {
+    background-color: #EEEFFF;
+}
+
+.cnx-search-cell {
+    vertical-align: top;
+    padding: 5px 15px;
+}
+
+.cnx-search-cell-market {
+    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.cnx-search-cell-fullname {
+    max-width: 250px;
+    min-width: 250px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.cnx-search-row:hover .cnx-search-cell-fullname {
+    white-space: normal;
+    height: 2em;
+}
+
+.cnx-search-highlight {
+    color: DodgerBlue;
+}
+
+.cnx-search-live {
+    color: DodgerBlue;
+}
+
+.cnx-search-cell-market,
+.cnx-search-cell-type {
+    color: grey;
+}

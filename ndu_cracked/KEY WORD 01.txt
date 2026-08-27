@@ -1,0 +1,88 @@
+cnxdatasdk-0.js
+=====================
+user
+BIZ_TRAINER_ID
+TRIAL_COUNTERS
+SUBCRIBER_AS_PRO
+cnx_getUserID
+register user state
+
+
+cnxtbizdata-0.js
+=====================
+Pro User
+
+cnxwidgetslayout-0.js
+=========================
+MAX_WATCHLIST_FREE_USER
+ENABLE_MENU_DISPLAY_USERNAME
+ENABLE_FREE_USER_CHECK
+TITLE_LIVE_ALERTS
+
+cnxwidgetslayout-64.js
+=========================
+userid=
+
+
+https://tbizfiles.chartnexus.com/cnxideawebv12/widget_20250617/js/cnx_common.js
+=======================
+const standard_mkt_order = ["0","2","3","4","5","15","14","19","20","17","18","12","16"]
+const exchangeName = {};
+exchangeName["0"] = "SGX";
+exchangeName["2"] = "KLSE";
+exchangeName["3"] = "NASDAQ";
+exchangeName["4"] = "NYSE";
+exchangeName["5"] = "AMEX";
+exchangeName["9"] = "NYSE ARCA";
+exchangeName["12"] = "BSE";
+exchangeName["16"] = "NSE";
+exchangeName["14"] = "JSX";
+exchangeName["15"] = "HKSE";
+exchangeName["17"] = "SSE";
+exchangeName["18"] = "SZSE";
+exchangeName["19"] = "SET";
+exchangeName["20"] = "PSE";
+exchangeName["23"] = "TWSE";
+exchangeName["24"] = "TPEX";
+exchangeName["1000"] = "US";
+
+
+
+
+https://ndu.chartnexus.com/tbiz/arts_plus/js_dynamic/cnx_common.js
+====================
+const standard_mkt_order = ["0","2","3","4","5","15","14","19","20","17","18","12","16"]
+function getMarketImg(market_id) {
+
+    switch (market_id) {
+       	case 0:            return '<img src="img/symb/sgx.svg">';
+        case 2:            return '<img src="img/symb/bursa.svg">';
+        case 15:            return '<img src="img/symb/hkse.svg">';
+        case 3:
+        case 4:
+        case 5:            return '<img src="img/symb/us.svg">';
+        case 14:            return '<img src="img/symb/jsx.svg">';
+        case 11:			return '<img src="img/symb/worldinx.svg">';
+        case 12:
+		case 16:
+		case 25:			return '<img src="img/symb/india.svg">';
+		case 17:
+		case 18:			return '<img src="img/symb/china.svg">';
+		case 19:			return '<img src="img/symb/set.svg">';
+		case 20:			return '<img src="img/symb/pse.svg">';
+		case 44:			return '<img src="img/symb/blackwell.svg">';
+		case 46:			return '<img src="img/symb/huobi.svg">';
+        default:            return market_id;
+    }
+}
+
+
+https://ndu.chartnexus.com/tbiz/arts_plus/
+=======================================
+// 			"fascrnr" : {
+// 				"minw" : widget_minw, "maxw" : 500, "defw" : 300,  
+// 				"title" : "FA Screener",
+// 				"url" : ideawebpath+"ncn_screener_panel.jsp",
+// 				"cnxpro" : 1,
+
+

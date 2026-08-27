@@ -1,0 +1,11 @@
+Replace tbizv1/image/art/favicon.ico
+to
+$$$-favicon.ico
+
+Replace tbizv1/image/art/NDU-Watermark.svg
+to
+$$$-Watermark.svg
+
+
+https://github.com/MichaelChay/NDU/blob/main/$$$-favicon.ico
+https://github.com/MichaelChay/NDU/blob/main/$$$-Watermark.svg
