@@ -1,1 +1,6 @@
-goto website https://ndu.chartnexus.com/tbiz/arts_plus/ create a tampermonkey script replace text "('TBIZ_SECTOR_SCREENER', false)"  to  "('TBIZ_SECTOR_SCREENER', true)"
+
+
+https://webchart.chartnexus.com/HTML5/
+
+https://ndu.chartnexus.com/tbiz/arts_plus/
+
