@@ -1,0 +1,84 @@
+// ==UserScript==
+// @name         4_(Subscriber) local GWT authenticated-state mock - ChartNexus
+// @namespace    chartnexus-staging-security-test
+// @version      1.0
+// @description  Locally rewrites the state.jsp XHR response to exercise the authenticated/subscriber UI. Does not create a server session.
+// @author       Fish Head Cracker
+// @match        https://ndu.chartnexus.com/tbiz/arts_plus/*
+// @run-at       document-start
+// @grant        unsafeWindow
+// ==/UserScript==
+
+(function () {
+    'use strict';
+
+    const pageWindow = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
+    const STATE_URL = 'https://tbizfiles.chartnexus.com/cnx-sociallinkv7/login/chartnexus/state.jsp';
+
+    // Synthetic, local-only identity. Module 363 is the entitlement checked by
+    // cnx_onGwt_verifyLoginModules() on this staging page.
+    const MOCK_STATE = Object.freeze({
+        error: 0,
+        data: Object.freeze({
+            uid: '900000001',
+            username: 'Fish Head',
+            defmid: 2,
+            old_subs_info: '363|NDU Local Test|2099-12-31|',
+            country: 'MY',
+            joined: '2026-08-08'
+        })
+    });
+    const MOCK_TEXT = JSON.stringify(MOCK_STATE);
+
+    const XHR = pageWindow.XMLHttpRequest;
+    const nativeOpen = XHR.prototype.open;
+    const responseTextDescriptor = Object.getOwnPropertyDescriptor(XHR.prototype, 'responseText');
+    const responseDescriptor = Object.getOwnPropertyDescriptor(XHR.prototype, 'response');
+    const mockedRequests = new WeakSet();
+
+    function isStateUrl(url) {
+        try {
+            return new URL(String(url), pageWindow.location.href).href === STATE_URL;
+        } catch (_) {
+            return false;
+        }
+    }
+
+    XHR.prototype.open = function (method, url, ...rest) {
+        if (isStateUrl(url)) {
+            mockedRequests.add(this);
+        }
+        return nativeOpen.call(this, method, url, ...rest);
+    };
+
+    if (responseTextDescriptor?.get) {
+        Object.defineProperty(XHR.prototype, 'responseText', {
+            configurable: responseTextDescriptor.configurable,
+            enumerable: responseTextDescriptor.enumerable,
+            get() {
+                if (mockedRequests.has(this) && this.readyState === XHR.DONE) {
+                    return MOCK_TEXT;
+                }
+                return responseTextDescriptor.get.call(this);
+            }
+        });
+    }
+
+    if (responseDescriptor?.get) {
+        Object.defineProperty(XHR.prototype, 'response', {
+            configurable: responseDescriptor.configurable,
+            enumerable: responseDescriptor.enumerable,
+            get() {
+                if (mockedRequests.has(this) && this.readyState === XHR.DONE) {
+                    return this.responseType === 'json' ? MOCK_STATE : MOCK_TEXT;
+                }
+                return responseDescriptor.get.call(this);
+            }
+        });
+    }
+
+    console.warn(
+        '[Local GWT state mock] Enabled for this frame. No server session or backend privilege was created.',
+        pageWindow.frameElement?.id || 'top'
+    );
+})();

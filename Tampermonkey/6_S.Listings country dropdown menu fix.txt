@@ -1,0 +1,75 @@
+// ==UserScript==
+// @name         6__S.Listings country dropdown menu fix - ChartNexus
+// @namespace    https://ndu.chartnexus.com/tbiz/arts_plus/
+// @version      1.0
+// @description  Restores the missing market/country choices in the S.Listings widget.
+// @author       Fish Head Cracker
+// @match        https://tbizfiles.chartnexus.com/cnxideawebv12/widget_*/ncn_stock_listing_panel.jsp*
+// @run-at       document-idle
+// @sandbox      JavaScript
+// @grant        unsafeWindow
+// ==/UserScript==
+
+(function () {
+    'use strict';
+
+    // This is the fallback list left in a comment in the widget's own source. 
+    const DEFAULT_MARKET = 2; // KLSE / Malaysia
+	const FALLBACK_MARKETS = [DEFAULT_MARKET, 0,3,4,5,15,17,18,12,16,14,19,20];
+    const page = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
+
+    let observer;
+    let repairing = false;
+
+    function menuIsBroken(table) {
+        const rows = [...table.rows];
+
+        return rows.length === 0 || rows.every((row) => {
+            const text = row.textContent.trim();
+            const image = row.querySelector('img')?.getAttribute('src') || '';
+
+            return !text
+                || text.includes('cnx-common-exchange-short-')
+                || /(?:^|\/)img\/\.svg(?:\?|$)/.test(image);
+        });
+    }
+
+    function repairMenu() {
+        if (repairing) return false;
+
+        const table = document.querySelector('#mkd_list');
+        if (!table
+            || typeof page.fetchMarketList !== 'function'
+            || typeof page.chgMarket !== 'function') return false;
+
+        if (!menuIsBroken(table)) return true;
+
+        repairing = true;
+        try {
+            page.marketids = FALLBACK_MARKETS.join(',');
+            page.fetchMarketList();
+            page.chgMarket(DEFAULT_MARKET);
+            document.querySelector('#sel_mkt')?.setAttribute('title', 'Select market');
+            console.info('[ChartNexus country fix] Restored the market menu with KLSE selected.');
+        } finally {
+            repairing = false;
+        }
+
+        return true;
+    }
+
+    const startupTimer = setInterval(() => {
+        const table = document.querySelector('#mkd_list');
+        if (!table
+            || typeof page.fetchMarketList !== 'function'
+            || typeof page.chgMarket !== 'function') return;
+
+        clearInterval(startupTimer);
+        observer = new MutationObserver(repairMenu);
+        observer.observe(table, { childList: true, subtree: true });
+        repairMenu();
+    }, 100);
+
+    // Avoid leaving a timer behind if the site changes its widget markup.
+    setTimeout(() => clearInterval(startupTimer), 10000);
+})();
