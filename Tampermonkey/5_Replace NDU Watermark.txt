@@ -1,0 +1,327 @@
+// ==UserScript==
+// @name         5_Replace NDU Watermark
+// @namespace    https://github.com/MichaelChay/NDU
+// @version      1.0
+// @description  Replace the NDU watermark
+// @author       Fish Head Cracker
+// @match        https://ndu.chartnexus.com/tbiz/arts_plus/*
+// @run-at       document-start
+// @sandbox      raw
+// @grant        none
+// ==/UserScript==
+
+(() => {
+    'use strict';
+
+    const CUSTOM_WATERMARK =
+//		'https://raw.githubusercontent.com/MichaelChay/NDU/main/Image/$$$-Watermark.svg';
+//		'https://raw.githubusercontent.com/MichaelChay/NDU/main/Image/wallet/Wallet_00.svg';
+//		'https://raw.githubusercontent.com/MichaelChay/NDU/main/Image/wallet/Wallet_04.svg';
+
+
+    const WATERMARK_WIDTH = 600;
+    const WATERMARK_HEIGHT = 300;
+//	const WATERMARK_WIDTH = 544;
+//	const WATERMARK_HEIGHT = 213;
+
+    const CONFIG_OVERRIDES = {
+        WATERMARK_PNG: CUSTOM_WATERMARK,
+        WTRMK_WIDTH: WATERMARK_WIDTH,
+        WTRMK_HEIGHT: WATERMARK_HEIGHT
+    };
+
+    const IMAGE_HOOK = Symbol.for('ndu.watermark.image-hook');
+    const ATTRIBUTE_HOOK = Symbol.for('ndu.watermark.attribute-hook');
+    const CANVAS_HOOK = Symbol.for('ndu.watermark.canvas-hook');
+
+    function isWatermarkUrl(value) {
+        return /(?:NDU-Watermark|\$\$\$-Watermark)\.svg/i
+            .test(String(value || ''));
+    }
+
+    function rewriteUrl(value) {
+        return isWatermarkUrl(value)
+            ? CUSTOM_WATERMARK
+            : value;
+    }
+
+    function lockConfig(config) {
+        if (!config || typeof config !== 'object') {
+            return config;
+        }
+
+        for (const [key, value] of Object.entries(CONFIG_OVERRIDES)) {
+            try {
+                const descriptor =
+                    Object.getOwnPropertyDescriptor(config, key);
+
+                if (descriptor?.configurable === false) {
+                    config[key] = value;
+                    continue;
+                }
+
+                Object.defineProperty(config, key, {
+                    configurable: true,
+                    enumerable: descriptor?.enumerable ?? true,
+
+                    get() {
+                        return value;
+                    },
+
+                    set() {
+                        // Keep the override locked.
+                    }
+                });
+            } catch {
+                try {
+                    config[key] = value;
+                } catch {}
+            }
+        }
+
+        return config;
+    }
+
+    // Patch cnxvar_tbiz before and after the site initializes it.
+    let configValue;
+
+    try {
+        const previous = Object.getOwnPropertyDescriptor(
+            window,
+            'cnxvar_tbiz'
+        );
+
+        if (previous) {
+            configValue = previous.get
+                ? previous.get.call(window)
+                : previous.value;
+        }
+
+        Object.defineProperty(window, 'cnxvar_tbiz', {
+            configurable: true,
+            enumerable: previous?.enumerable ?? true,
+
+            get() {
+                return configValue;
+            },
+
+            set(value) {
+                configValue = lockConfig(value);
+            }
+        });
+
+        configValue = lockConfig(configValue);
+    } catch {
+        lockConfig(window.cnxvar_tbiz);
+    }
+
+    // Rewrite image URLs if the chart requests the original watermark.
+    function installImageHooks() {
+        const imagePrototype =
+            window.HTMLImageElement?.prototype;
+
+        if (!imagePrototype) {
+            return;
+        }
+
+        if (!imagePrototype[IMAGE_HOOK]) {
+            const descriptor =
+                Object.getOwnPropertyDescriptor(
+                    imagePrototype,
+                    'src'
+                );
+
+            if (descriptor?.set) {
+                try {
+                    Object.defineProperty(
+                        imagePrototype,
+                        'src',
+                        {
+                            configurable: descriptor.configurable,
+                            enumerable: descriptor.enumerable,
+
+                            get: descriptor.get,
+
+                            set(value) {
+                                return descriptor.set.call(
+                                    this,
+                                    rewriteUrl(value)
+                                );
+                            }
+                        }
+                    );
+                } catch {}
+            }
+
+            try {
+                Object.defineProperty(
+                    imagePrototype,
+                    IMAGE_HOOK,
+                    { value: true }
+                );
+            } catch {}
+        }
+
+        if (!Element.prototype[ATTRIBUTE_HOOK]) {
+            const originalSetAttribute =
+                Element.prototype.setAttribute;
+
+            try {
+                Object.defineProperty(
+                    Element.prototype,
+                    'setAttribute',
+                    {
+                        configurable: true,
+                        writable: true,
+
+                        value(name, value) {
+                            if (
+                                this instanceof HTMLImageElement &&
+                                String(name).toLowerCase() === 'src'
+                            ) {
+                                value = rewriteUrl(value);
+                            }
+
+                            return originalSetAttribute.call(
+                                this,
+                                name,
+                                value
+                            );
+                        }
+                    }
+                );
+
+                Object.defineProperty(
+                    Element.prototype,
+                    ATTRIBUTE_HOOK,
+                    { value: true }
+                );
+            } catch {}
+        }
+    }
+
+    // Force the watermark to draw at the selected size.
+    function installCanvasHook() {
+        const prototypes = [
+            window.CanvasRenderingContext2D?.prototype,
+            window.OffscreenCanvasRenderingContext2D?.prototype
+        ].filter(Boolean);
+
+        for (const prototype of prototypes) {
+            if (prototype[CANVAS_HOOK]) {
+                continue;
+            }
+
+            const originalDrawImage =
+                prototype.drawImage;
+
+            if (typeof originalDrawImage !== 'function') {
+                continue;
+            }
+
+            try {
+                Object.defineProperty(
+                    prototype,
+                    'drawImage',
+                    {
+                        configurable: true,
+                        writable: true,
+
+                        value(image, ...args) {
+                            if (!isWatermarkUrl(
+                                image?.currentSrc || image?.src
+                            )) {
+                                return originalDrawImage.call(
+                                    this,
+                                    image,
+                                    ...args
+                                );
+                            }
+
+                            // drawImage(image, dx, dy, dw, dh)
+                            if (args.length === 4) {
+                                const [
+                                    dx,
+                                    dy,
+                                    dw,
+                                    dh
+                                ] = args;
+
+                                const centerX =
+                                    Number(dx) + Number(dw) / 2;
+                                const centerY =
+                                    Number(dy) + Number(dh) / 2;
+
+                                args = [
+                                    centerX - WATERMARK_WIDTH / 2,
+                                    centerY - WATERMARK_HEIGHT / 2,
+                                    WATERMARK_WIDTH,
+                                    WATERMARK_HEIGHT
+                                ];
+                            }
+
+                            // drawImage(
+                            //   image, sx, sy, sw, sh,
+                            //   dx, dy, dw, dh
+                            // )
+                            if (args.length === 8) {
+                                const [
+                                    sx,
+                                    sy,
+                                    sw,
+                                    sh,
+                                    dx,
+                                    dy,
+                                    dw,
+                                    dh
+                                ] = args;
+
+                                const centerX =
+                                    Number(dx) + Number(dw) / 2;
+                                const centerY =
+                                    Number(dy) + Number(dh) / 2;
+
+                                args = [
+                                    sx,
+                                    sy,
+                                    sw,
+                                    sh,
+                                    centerX - WATERMARK_WIDTH / 2,
+                                    centerY - WATERMARK_HEIGHT / 2,
+                                    WATERMARK_WIDTH,
+                                    WATERMARK_HEIGHT
+                                ];
+                            }
+
+                            return originalDrawImage.call(
+                                this,
+                                image,
+                                ...args
+                            );
+                        }
+                    }
+                );
+
+                Object.defineProperty(
+                    prototype,
+                    CANVAS_HOOK,
+                    { value: true }
+                );
+            } catch {}
+        }
+    }
+
+    installImageHooks();
+    installCanvasHook();
+
+    // Retry briefly because the chart iframe may initialize later.
+    const timer = setInterval(() => {
+        lockConfig(window.cnxvar_tbiz);
+        installImageHooks();
+        installCanvasHook();
+    }, 50);
+
+    setTimeout(() => {
+        clearInterval(timer);
+    }, 30000);
+})();
