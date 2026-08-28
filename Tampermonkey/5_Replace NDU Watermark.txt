@@ -19,7 +19,7 @@
 //		'https://raw.githubusercontent.com/MichaelChay/NDU/main/Image/happyface/$$$01.svg';
 //		'https://raw.githubusercontent.com/MichaelChay/NDU/main/Image/happyface/$$$02.svg';
 
-//		'https://raw.githubusercontent.com/MichaelChay/NDU/main/Image/wallet/Wallet_00.svg';
+		'https://raw.githubusercontent.com/MichaelChay/NDU/main/Image/wallet/Wallet_00.svg';
 //		'https://raw.githubusercontent.com/MichaelChay/NDU/main/Image/wallet/Wallet_04.svg';
 
 
