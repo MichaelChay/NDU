@@ -1,0 +1,96 @@
+// ==UserScript==
+// @name         Dividend country fix - ChartNexus
+// @namespace    https://ndu.chartnexus.com/tbiz/arts_plus/
+// @version      1.0
+// @description  Restores the five country choices supported by the staging Dividend popup.
+// @author       Fish Head Cracker
+// @match        https://dividend.chartnexus.com/dividend/dividend_panel.jsp*
+// @run-at       document-idle
+// @sandbox      JavaScript
+// @grant        unsafeWindow
+// ==/UserScript==
+
+(function () {
+    'use strict';
+
+    // This popup is hosted on a separate domain. Only alter an iframe embedded
+    // by the user's staging site, not other sites using the Dividend widget.
+    if (window.top === window.self) return;
+    try {
+        // Chrome retains the parent origin here even when an iframe reload
+        // changes document.referrer to the Dividend URL itself.
+        const parentOrigin = location.ancestorOrigins?.[0]
+            || new URL(document.referrer).origin;
+        if (parentOrigin !== 'https://ndu.chartnexus.com') return;
+    } catch (_) {
+        return;
+    }
+
+    const page = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
+    // The widget groups NASDAQ, NYSE and AMEX into one United States choice.
+    // World Indices, Thailand and the Philippines have no menu implementation.
+    const DIVIDEND_MARKETS = [2, 0, 3, 4, 5, 14, 15];
+    const COUNTRIES = ['my', 'sg', 'us', 'id', 'hk'];
+    const FIX_MARKER = '__cnxStagingDividendCountries';
+
+    function parseMarketIds(value) {
+        return String(value ?? '').split(',')
+            .map(id => id.trim().replace(/^["']|["']$/g, ''))
+            .filter(id => /^\d+$/.test(id))
+            .map(Number);
+    }
+
+    function installFix() {
+        const menu = document.querySelector('#MarketDropdown');
+        if (!menu || typeof page.processMarket !== 'function'
+            || typeof page.cnx_readLocalStorage !== 'function') return false;
+
+        if (!page.processMarket[FIX_MARKER]) {
+            const originalProcessMarket = page.processMarket;
+            const processMarketWithCountries = function (marketIds, ...rest) {
+                // Preserve an existing preference, or remember the visible
+                // country before the widget chooses its Singapore default.
+                const selected = document.querySelector('#dropdownMenuButton span')
+                    ?.textContent.trim().toLowerCase();
+                if (COUNTRIES.includes(selected)
+                    && typeof page.cnx_writeLocalStorage === 'function'
+                    && !COUNTRIES.includes(page.cnx_readLocalStorage('dividend-country'))) {
+                    page.cnx_writeLocalStorage('dividend-country', selected);
+                }
+
+                const markets = [...new Set([
+                    ...parseMarketIds(marketIds),
+                    ...DIVIDEND_MARKETS,
+                ])];
+                // The native renderer appends country codes on every call.
+                page.usrmkt = [];
+                return originalProcessMarket.call(this, markets, ...rest);
+            };
+            processMarketWithCountries[FIX_MARKER] = true;
+            page.processMarket = processMarketWithCountries;
+        }
+
+        const present = new Set([...menu.querySelectorAll('[data-mkt]')]
+            .map(item => item.dataset.mkt));
+        if (COUNTRIES.every(country => present.has(country))) return true;
+
+        // If the original renderer already requested Malaysia before this hook
+        // was installed, let that request finish first. A post-render observer
+        // would launch competing requests and could show data for the wrong flag.
+        const initialResults = document.querySelector('#dividendData')?.textContent.trim();
+        if (!initialResults) return false;
+
+        page.processMarket(page.usrmid);
+        console.info('[ChartNexus Dividend country fix] Restored five country choices.');
+        return true;
+    }
+
+    const startupTimer = setInterval(() => {
+        if (installFix()) clearInterval(startupTimer);
+    }, 100);
+
+    setTimeout(() => clearInterval(startupTimer), 30000);
+    window.addEventListener('pagehide', () => {
+        clearInterval(startupTimer);
+    }, { once: true });
+})();
