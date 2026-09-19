@@ -1,0 +1,520 @@
+// ==UserScript==
+// @name         _Perfect_Crack - ChartNexus
+// @namespace    https://ndu.chartnexus.com/tbiz/arts_plus/
+// @version      1.0
+// @description  Local staging UI state, login cleanup, market menu fixes, and a background watermark.
+// @match        https://ndu.chartnexus.com/tbiz/arts_plus/*
+// @match        https://tbizfiles.chartnexus.com/cnxideawebv12/widget_*/ncn_stock_listing_panel.jsp*
+// @match        https://dividend.chartnexus.com/dividend/dividend_panel.jsp*
+// @match        https://tbizfiles.chartnexus.com/cnxideawebv12/widget_*/ncn_tbiz_all_earning_calendar.jsp*
+// @run-at       document-start
+// @sandbox      raw
+// @grant        unsafeWindow
+// ==/UserScript==
+
+(function () {
+    'use strict';
+
+    // Set an individual option to false to disable that part of the toolkit.
+    const FEATURES = Object.freeze({
+        localStateMock: true,
+        hideLoginOverlay: true,
+        stockListingMarkets: true,
+        calendarCountries: true,
+        customWatermark: true,
+    });
+    const WATERMARK = Object.freeze({
+	//		'https://raw.githubusercontent.com/MichaelChay/NDU/main/Image/$$$-Watermark.svg',
+
+//		url: 'https://raw.githubusercontent.com/MichaelChay/NDU/main/Image/happyface/$$$01.svg',
+//		url: 'https://raw.githubusercontent.com/MichaelChay/NDU/main/Image/happyface/$$$02.svg',
+
+//		url: 'https://raw.githubusercontent.com/MichaelChay/NDU/main/Image/wallet/Wallet_04.svg',
+		url: 'https://raw.githubusercontent.com/MichaelChay/NDU/main/Image/wallet/Wallet_00.svg',
+//		width: 600,
+//      height: 300,
+		width: 544,
+        height: 213,
+    });
+
+    const STAGING_ORIGIN = 'https://ndu.chartnexus.com';
+    const APP_PATH = '/tbiz/arts_plus/';
+    const FILES_ORIGIN = 'https://tbizfiles.chartnexus.com';
+    const page = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
+    const isApp = location.origin === STAGING_ORIGIN && location.pathname.startsWith(APP_PATH);
+    const isStockListing = location.origin === FILES_ORIGIN
+        && /^\/cnxideawebv12\/widget_[^/]*\/ncn_stock_listing_panel\.jsp$/.test(location.pathname)
+        && hasStagingEmbed();
+    const isEarningCalendar = location.origin === FILES_ORIGIN
+        && /^\/cnxideawebv12\/widget_[^/]*\/ncn_tbiz_all_earning_calendar\.jsp$/.test(location.pathname);
+    const isCalendar = ((location.origin === 'https://dividend.chartnexus.com'
+        && location.pathname === '/dividend/dividend_panel.jsp')
+        || isEarningCalendar)
+        && hasStagingParent();
+
+    if (!isApp && !isStockListing && !isCalendar) return;
+    const INSTANCE_MARKER = '__cnxStagingToolkitV1';
+    if (page[INSTANCE_MARKER]) return;
+    Object.defineProperty(page, INSTANCE_MARKER, { value: true, configurable: true });
+
+    const cleanups = new Set();
+    let domFixesRunning = false;
+    const calendarParams = new URLSearchParams(location.search);
+    // Apply once per Earning Calendar load, including an old saved Singapore
+    // preference. Explicit stock links and later manual selections take priority.
+    let earningDefaultPending = isEarningCalendar
+        && !(calendarParams.get('mid') && calendarParams.get('symb'));
+
+    // XHR and watermark hooks must precede page scripts; DOM fixes wait.
+    if (isApp && FEATURES.localStateMock) runFeature('local state mock', installStateMock);
+    if (isApp && FEATURES.customWatermark) runFeature('custom watermark', installCustomWatermark);
+    if (document.readyState === 'loading') {
+        window.addEventListener('DOMContentLoaded', startDomFixes, { once: true });
+    } else {
+        startDomFixes();
+    }
+    window.addEventListener('pagehide', () => {
+        for (const stop of [...cleanups]) stop();
+        domFixesRunning = false;
+    });
+    window.addEventListener('pageshow', event => {
+        // Restore DOM observers after browser Back/Forward cache restoration.
+        if (event.persisted) startDomFixes();
+    });
+
+    function hasStagingEmbed() {
+        try {
+            const embed = new URL(new URLSearchParams(location.search).get('iframeUrl'));
+            return embed.origin === STAGING_ORIGIN && embed.pathname.startsWith(APP_PATH);
+        } catch (_) {
+            return false;
+        }
+    }
+
+    function hasStagingParent() {
+        if (window.top === window.self) return false;
+        try {
+            const parentOrigin = location.ancestorOrigins?.[0] || new URL(document.referrer).origin;
+            return parentOrigin === STAGING_ORIGIN;
+        } catch (_) {
+            return false;
+        }
+    }
+
+    function parseMarketIds(value) {
+        return [...new Set(String(value ?? '').split(',')
+            .map(id => id.trim().replace(/^["']|["']$/g, ''))
+            .filter(id => /^\d+$/.test(id))
+            .map(id => String(Number(id))))];
+    }
+
+    function runFeature(name, start) {
+        try {
+            start();
+        } catch (error) {
+            console.warn('[ChartNexus toolkit] Could not start ' + name + '.', error);
+        }
+    }
+
+    function startDomFixes() {
+        if (domFixesRunning) return;
+        domFixesRunning = true;
+        if (isApp && location.pathname === APP_PATH && FEATURES.hideLoginOverlay) {
+            runFeature('login overlay cleanup', installOverlayCleanup);
+        }
+        if (isStockListing && FEATURES.stockListingMarkets) {
+            runFeature('stock listing menus', installStockListingFix);
+        }
+        if (isCalendar && FEATURES.calendarCountries) {
+            runFeature('calendar menus', installCalendarFix);
+        }
+    }
+
+    // Functions exposed by the widgets can become available after DOM ready.
+    // Check immediately, then retry briefly; release both timers on completion.
+    function waitUntil(check, timeoutMs) {
+        const stop = () => {
+            clearInterval(timer);
+            clearTimeout(deadline);
+            cleanups.delete(stop);
+        };
+        const tick = () => {
+            try {
+                if (check()) stop();
+            } catch (error) {
+                stop();
+                console.warn('[ChartNexus toolkit] Widget initialization failed.', error);
+            }
+        };
+        const timer = setInterval(tick, 100);
+        const deadline = setTimeout(stop, timeoutMs);
+        cleanups.add(stop);
+        tick();
+    }
+
+    function installStateMock() {
+        const STATE_URL = FILES_ORIGIN + '/cnx-sociallinkv7/login/chartnexus/state.jsp';
+        // Same synthetic identity and module 363 entitlement as the original.
+        // This changes local UI state only; it does not create a server session.
+        const mockState = Object.freeze({
+            error: 0,
+            data: Object.freeze({
+                uid: '900000001',
+                username: 'Fish Head',
+                defmid: 2,
+				old_subs_info: '363|NDU Local Test|2030-12-31|',
+				country: 'MY',
+				joined: '2026-08-08'
+				}),
+        });
+        const mockText = JSON.stringify(mockState);
+        const XHR = page.XMLHttpRequest;
+        const prototype = XHR.prototype;
+        const nativeOpen = prototype.open;
+        const textDescriptor = Object.getOwnPropertyDescriptor(prototype, 'responseText');
+        const responseDescriptor = Object.getOwnPropertyDescriptor(prototype, 'response');
+        if (!textDescriptor?.get || !responseDescriptor?.get
+            || !textDescriptor.configurable || !responseDescriptor.configurable) {
+            console.warn('[ChartNexus toolkit] XHR response getters cannot be patched.');
+            return;
+        }
+        const mockedRequests = new WeakSet();
+        const isText = xhr => xhr.responseType === '' || xhr.responseType === 'text';
+
+        prototype.open = function (method, url, ...rest) {
+            // An XHR instance can be reused. Clear the previous request's flag.
+            mockedRequests.delete(this);
+            try {
+                if (new URL(String(url), page.location.href).href === STATE_URL) {
+                    mockedRequests.add(this);
+                }
+            } catch (_) { /* Leave URL validation to native open(). */ }
+            try {
+                return nativeOpen.call(this, method, url, ...rest);
+            } catch (error) {
+                mockedRequests.delete(this);
+                throw error;
+            }
+        };
+        Object.defineProperty(prototype, 'responseText', {
+            ...textDescriptor,
+            get() {
+                if (mockedRequests.has(this) && this.readyState === XHR.DONE && isText(this)) {
+                    return mockText;
+                }
+                return textDescriptor.get.call(this);
+            },
+        });
+        Object.defineProperty(prototype, 'response', {
+            ...responseDescriptor,
+            get() {
+                if (mockedRequests.has(this) && this.readyState === XHR.DONE) {
+                    if (this.responseType === 'json') return mockState;
+                    if (isText(this)) return mockText;
+                }
+                // Keep native behavior for document, blob and arraybuffer.
+                return responseDescriptor.get.call(this);
+            },
+        });
+        console.info('[ChartNexus toolkit] Local UI state mock enabled; no server session is created.');
+    }
+
+    function installCustomWatermark() {
+        const imageHook = Symbol.for('ndu.watermark.image-hook');
+        const attributeHook = Symbol.for('ndu.watermark.attribute-hook');
+        const canvasHook = Symbol.for('ndu.watermark.canvas-hook');
+        const ignoreWrite = () => {};
+        const overrides = Object.entries({
+            WATERMARK_PNG: WATERMARK.url,
+            WTRMK_WIDTH: WATERMARK.width,
+            WTRMK_HEIGHT: WATERMARK.height,
+        }).map(([key, value]) => ({ key, value, get: () => value }));
+
+        function isWatermarkUrl(value) {
+            const url = String(value || '');
+            // Image.src retains %24 in the custom URL, so accept both forms.
+            return url === WATERMARK.url
+                || /(?:^|\/)(?:NDU-Watermark|(?:\$|%24){3}-Watermark)\.svg(?:[?#]|$)/i.test(url);
+        }
+        const rewriteUrl = value => isWatermarkUrl(value) ? WATERMARK.url : value;
+
+        function lockConfig(config) {
+            if (!config || typeof config !== 'object') return config;
+            for (const { key, value, get } of overrides) {
+                try {
+                    const descriptor = Object.getOwnPropertyDescriptor(config, key);
+                    // Stable getters let retries skip properties already locked.
+                    if (descriptor?.get === get && descriptor.set === ignoreWrite) continue;
+                    if (descriptor?.configurable === false) {
+                        if (config[key] !== value) config[key] = value;
+                        continue;
+                    }
+                    Object.defineProperty(config, key, {
+                        configurable: true,
+                        enumerable: descriptor?.enumerable ?? true,
+                        get,
+                        set: ignoreWrite,
+                    });
+                } catch (_) {
+                    try { config[key] = value; } catch (_) { /* Read-only configuration. */ }
+                }
+            }
+            return config;
+        }
+
+        // Lock both an existing config and objects assigned during chart startup.
+        let configValue;
+        try {
+            const previous = Object.getOwnPropertyDescriptor(page, 'cnxvar_tbiz');
+            configValue = previous?.get ? previous.get.call(page) : previous?.value;
+            Object.defineProperty(page, 'cnxvar_tbiz', {
+                configurable: true,
+                enumerable: previous?.enumerable ?? true,
+                get: () => configValue,
+                set: value => { configValue = lockConfig(value); },
+            });
+            lockConfig(configValue);
+        } catch (_) {
+            lockConfig(page.cnxvar_tbiz);
+        }
+
+        function installImageHooks() {
+            const imagePrototype = page.HTMLImageElement?.prototype;
+            if (!imagePrototype) return;
+            if (!imagePrototype[imageHook]) {
+                const descriptor = Object.getOwnPropertyDescriptor(imagePrototype, 'src');
+                if (descriptor?.set) {
+                    try {
+                        Object.defineProperty(imagePrototype, 'src', {
+                            ...descriptor,
+                            set(value) { return descriptor.set.call(this, rewriteUrl(value)); },
+                        });
+                        Object.defineProperty(imagePrototype, imageHook, { value: true });
+                    } catch (_) { /* Retry if the page exposes a patchable prototype later. */ }
+                }
+            }
+
+            const elementPrototype = page.Element?.prototype;
+            if (!elementPrototype || elementPrototype[attributeHook]) return;
+            const descriptor = Object.getOwnPropertyDescriptor(elementPrototype, 'setAttribute');
+            const originalSetAttribute = elementPrototype.setAttribute;
+            if (typeof originalSetAttribute !== 'function') return;
+            try {
+                Object.defineProperty(elementPrototype, 'setAttribute', {
+                    ...descriptor,
+                    value(name, value) {
+                        if (this instanceof page.HTMLImageElement && String(name).toLowerCase() === 'src') {
+                            value = rewriteUrl(value);
+                        }
+                        return originalSetAttribute.call(this, name, value);
+                    },
+                });
+                Object.defineProperty(elementPrototype, attributeHook, { value: true });
+            } catch (_) { /* Leave unpatchable native methods alone. */ }
+        }
+
+        function installCanvasHooks() {
+            const prototypes = [
+                page.CanvasRenderingContext2D?.prototype,
+                page.OffscreenCanvasRenderingContext2D?.prototype,
+            ].filter(Boolean);
+            for (const prototype of prototypes) {
+                if (prototype[canvasHook] || typeof prototype.drawImage !== 'function') continue;
+                const originalDrawImage = prototype.drawImage;
+                const descriptor = Object.getOwnPropertyDescriptor(prototype, 'drawImage');
+                try {
+                    Object.defineProperty(prototype, 'drawImage', {
+                        ...descriptor,
+                        value(image, ...args) {
+                            if (isWatermarkUrl(image?.currentSrc || image?.src)
+                                && (args.length === 4 || args.length === 8)) {
+                                // Both sized overloads end with dx, dy, dw, dh.
+                                // Preserve the destination center and source crop.
+                                const start = args.length - 4;
+                                const [dx, dy, dw, dh] = args.slice(start);
+                                args.splice(start, 4,
+                                    Number(dx) + Number(dw) / 2 - WATERMARK.width / 2,
+                                    Number(dy) + Number(dh) / 2 - WATERMARK.height / 2,
+                                    WATERMARK.width, WATERMARK.height);
+                            }
+                            return originalDrawImage.call(this, image, ...args);
+                        },
+                    });
+                    Object.defineProperty(prototype, canvasHook, { value: true });
+                } catch (_) { /* Leave unpatchable native methods alone. */ }
+            }
+        }
+
+        let stopRetry;
+        function startChecks() {
+            stopRetry?.();
+            const refresh = () => {
+                lockConfig(page.cnxvar_tbiz);
+                installImageHooks();
+                installCanvasHooks();
+            };
+            refresh();
+            // Hooks apply immediately. Brief retries cover late/redefined config
+            // and constructors, with fewer checks than the original 50 ms loop.
+            const timer = setInterval(refresh, 250);
+            const stop = () => {
+                clearInterval(timer);
+                clearTimeout(deadline);
+                cleanups.delete(stop);
+                stopRetry = undefined;
+            };
+            const deadline = setTimeout(stop, 30000);
+            stopRetry = stop;
+            cleanups.add(stop);
+        }
+        startChecks();
+        window.addEventListener('pageshow', event => {
+            if (event.persisted) runFeature('watermark refresh', startChecks);
+        });
+    }
+
+    function installOverlayCleanup() {
+        const body = document.body;
+        if (!body) return;
+        function removeLoginOverlay() {
+            document.getElementById('myLoginModal')?.remove();
+            // Preserve backdrops and scroll locking for other open dialogs.
+            if (document.querySelector('.modal.show, .modal.in, .modal[aria-modal="true"]')) return;
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            if (!backdrops.length && !body.classList.contains('modal-open')) return;
+            backdrops.forEach(element => element.remove());
+            body.classList.remove('modal-open');
+            body.style.removeProperty('overflow');
+            body.style.removeProperty('padding-right');
+        }
+        const observer = new MutationObserver(removeLoginOverlay);
+        observer.observe(body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['class', 'style'],
+        });
+        const stop = () => {
+            observer.disconnect();
+            clearTimeout(deadline);
+            cleanups.delete(stop);
+        };
+        // Retain the original three-second startup window, without polling/log spam.
+        const deadline = setTimeout(stop, 3000);
+        cleanups.add(stop);
+        removeLoginOverlay();
+    }
+
+    function installStockListingFix() {
+        const fallbackMarkets = ['2', '11', '0', '3', '4', '5', '14', '15', '19', '20'];
+        const observerOptions = { childList: true, subtree: true, characterData: true };
+        waitUntil(() => {
+            const table = document.querySelector('#mkd_list');
+            if (!table || typeof page.fetchMarketList !== 'function'
+                || typeof page.chgMarket !== 'function') return false;
+
+            const renderedMarketIds = () => [...table.querySelectorAll('td[id^="mkt_flag_"]')]
+                .map(cell => cell.id.slice('mkt_flag_'.length))
+                .filter(id => /^\d+$/.test(id));
+            function repairMenu() {
+                const present = new Set(renderedMarketIds());
+                // Preserve extra markets supplied by the widget or another mock.
+                const expected = [...new Set([
+                    ...parseMarketIds(page.marketids), ...present, ...fallbackMarkets,
+                ])];
+                const missingMarket = expected.some(id => !present.has(id));
+                const brokenRow = [...table.rows].some(row => {
+                    const label = row.querySelector('[data-i18n]')?.textContent.trim() || '';
+                    const image = row.querySelector('img')?.getAttribute('src') || '';
+                    return !image || /(?:^|\/)img\/\.svg(?:\?|$)/.test(image)
+                        || (page.localeReady === true
+                            && (!label || label.includes('cnx-common-exchange-short-')));
+                });
+                if (!missingMarket && !brokenRow) return;
+
+                const selected = parseMarketIds(page.mkt_selected)[0];
+                // Disconnect while rebuilding so our mutations cannot trigger a loop.
+                observer.disconnect();
+                try {
+                    page.marketids = expected.join(',');
+                    page.fetchMarketList();
+                    if (!selected || !expected.includes(selected)) {
+                        page.chgMarket(2);
+                    } else {
+                        const button = document.querySelector('#sel_mkt');
+                        const flag = document.getElementById('mkt_flag_' + selected);
+                        if (button && flag) {
+                            button.replaceChildren(...[...flag.childNodes].map(node => node.cloneNode(true)));
+                        }
+                    }
+                    document.querySelector('#sel_mkt')?.setAttribute('title', 'Select market');
+                    console.info('[ChartNexus toolkit] Restored ' + expected.length + ' stock market choices.');
+                } finally {
+                    observer.observe(table, observerOptions);
+                }
+            }
+            const observer = new MutationObserver(() => {
+                runFeature('stock listing menu repair', repairMenu);
+            });
+            const stop = () => {
+                observer.disconnect();
+                cleanups.delete(stop);
+            };
+            cleanups.add(stop);
+            observer.observe(table, observerOptions);
+            repairMenu();
+            return true;
+        }, 10000);
+    }
+
+    function installCalendarFix() {
+        // US exchanges share one country. These widgets support five countries.
+        const supportedMarkets = ['2', '0', '3', '4', '5', '14', '15'];
+        const countries = ['my', 'sg', 'us', 'id', 'hk'];
+        const marker = '__cnxStagingDividendCountries';
+        waitUntil(() => {
+            const menu = document.querySelector('#MarketDropdown');
+            if (!menu || typeof page.processMarket !== 'function'
+                || typeof page.cnx_readLocalStorage !== 'function'
+                || (earningDefaultPending && typeof page.cnx_writeLocalStorage !== 'function')) return false;
+
+            if (!page.processMarket[marker]) {
+                const originalProcessMarket = page.processMarket;
+                const processMarketWithCountries = function (marketIds, ...rest) {
+                    const selected = document.querySelector('#dropdownMenuButton span')
+                        ?.textContent.trim().toLowerCase();
+                    const applyingEarningDefault = earningDefaultPending;
+                    if (applyingEarningDefault) {
+                        // The native renderer reads this before updating both
+                        // the flag and the data request (Malaysia market ID 2).
+                        page.cnx_writeLocalStorage('dividend-country', 'my');
+                    } else if (countries.includes(selected)
+                        && typeof page.cnx_writeLocalStorage === 'function'
+                        && !countries.includes(page.cnx_readLocalStorage('dividend-country'))) {
+                        page.cnx_writeLocalStorage('dividend-country', selected);
+                    }
+                    const markets = [...new Set([
+                        ...parseMarketIds(marketIds), ...supportedMarkets,
+                    ])].map(Number);
+                    // The native renderer appends on each call; avoid duplicates.
+                    page.usrmkt = [];
+                    const result = originalProcessMarket.call(this, markets, ...rest);
+                    if (applyingEarningDefault) earningDefaultPending = false;
+                    return result;
+                };
+                processMarketWithCountries[marker] = true;
+                page.processMarket = processMarketWithCountries;
+            }
+
+            const present = new Set([...menu.querySelectorAll('[data-mkt]')]
+                .map(item => item.dataset.mkt));
+            if (countries.every(country => present.has(country)) && !earningDefaultPending) return true;
+            // Preserve the original request ordering: wait for initial data so
+            // the rebuild cannot race the widget's first country data request.
+            if (!document.querySelector('#dividendData')?.textContent.trim()) return false;
+            page.processMarket(page.usrmid);
+            console.info('[ChartNexus toolkit] Restored five calendar country choices.');
+            return true;
+        }, 30000);
+    }
+})();
