@@ -1,0 +1,50 @@
+// ==UserScript==
+// @name         ChartNexus - (NAG) Auto-close announcement
+// @namespace    local.chartnexus.auto-close
+// @version      1.0
+// @description  Automatically dismiss the ChartNexus announcement and its iframe.
+// @author       Fish Head Cracker
+// @match        https://webchart.chartnexus.com/HTML5/*
+// @run-at       document-start
+// @noframes
+// @grant        none
+// ==/UserScript==
+
+(() => {
+    'use strict';
+
+    // The visible #cnxAnnounceOverlay lives inside this popup's iframe.
+    const popupId = 'cnx_announce_popup';
+    const dismissed = new WeakSet();
+
+    function closeAnnouncement() {
+        const popup = document.getElementById(popupId);
+        if (!popup || dismissed.has(popup)) return;
+        dismissed.add(popup);
+
+        // Hide it immediately, including the announcement's backdrop.
+        popup.style.setProperty('display', 'none', 'important');
+
+        // Use the site's existing dismiss handler to clean up the popup.
+        window.postMessage({
+            type: 'cnx_announce_dismiss',
+            id: popupId
+        }, window.location.origin);
+
+        // Fallback if the site's dismiss listener has not initialized yet.
+        // Unload media before removing the iframe so no hidden audio continues.
+        window.setTimeout(() => {
+            if (!popup.isConnected) return;
+            for (const frame of popup.querySelectorAll('iframe')) {
+                frame.src = 'about:blank';
+            }
+            popup.remove();
+        }, 100);
+    }
+
+    // Observe the Document, which exists even at document-start. Keep watching
+    // so announcements created after login or later in the session also close.
+    const observer = new MutationObserver(closeAnnouncement);
+    observer.observe(document, { childList: true, subtree: true });
+    closeAnnouncement();
+})();
